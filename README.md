@@ -299,7 +299,7 @@ If all goes well, you may see some package vulnerability results in your run sum
 
 ![image](https://github.com/user-attachments/assets/f92058b0-5248-4361-b95e-adf1d1f6bb41)
 
-Navigate to Repos > Advanced Security to see more:
+Navigate to **Repos** > **Advanced Security** to see more:
 
 ![image](https://github.com/user-attachments/assets/84d4106e-6b13-4dcd-9742-ff011e9f2209)
 
@@ -320,7 +320,7 @@ Refer to this block diagram for a simplified view of the process we'll detail in
 
 ![image](https://github.com/user-attachments/assets/f9328d2a-b720-46ec-8922-415fb29f2750)
 
-The file **index.ts** contains the definitions for each of our API operations.  Each definition specifies a method (GET, POST, PUT, or DELETE), a route (either 'products' or 'products/{id]'), an authentication level, and a handler.  The handler points the program to the function code in the Functions subdirectory.
+The file **index.ts** contains the definitions for each of our API operations.  Each definition specifies a method (GET, POST, PUT, or DELETE), a route (either `products` or `products/{id}`), an authentication level, and a handler.  The handler points the program to the function code in the Functions subdirectory.
 
 Open up the file **QueryProducts.ts**.  You will see import statements that bring modules from the [@azure/functions npm package](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-node?tabs=typescript%2Cwindows%2Cazure-cli&pivots=nodejs-model-v4).  Another import statement references the **product.services.ts** file from /src/services/, which we will explore in a moment.  The rest of the **QueryProducts** file defines a function that parses an item ID from the body of the incoming API request, passes this parameter to the **query()** function in **product.services**, and returns the result with a successful 200 status or a 500 error upon failure.
 
@@ -328,7 +328,7 @@ If we inspect **/services/product.services.ts**, we will see the actual code tha
 
 We also need to verify that the **databaseId** and **containerId** values match our Cosmos DB database and container IDs.  The quick start tutorial will populate these fields for us, but if there is already a container with that name, the tutorial will add a serial number.  We need to match the values in **product.services.ts** with whichever container has the sample dataset loaded.
 
-Continuing with our tour of the source code, **product.services.ts** contains a main function **init()** that creates a new Cosmos DB client out of our connection string, database ID, and container ID.  It will use this client to execute the **create()**, **read()**,** query()**, **update()**, and **delete()** functions.  The main one we're concerned with is **query()**, as it allows us to run a SQL query with a user-defined `id` parameter.  We will use this to test SQL injection alerts.  Our **query()** function defines the Cosmos DB method to query all items in the container and fetch all results.  The results are written to a variable named `queryResults` and returned to the calling function in **QueryProducts.ts**.
+Continuing with our tour of the source code, **product.services.ts** contains a main function **init()** that creates a new Cosmos DB client out of our connection string, database ID, and container ID.  It will use this client to execute the **create()**, **read()**, **query()**, **update()**, and **delete()** functions.  The main one we're concerned with is **query()**, as it allows us to run a SQL query with a user-defined `id` parameter.  We will use this to test SQL injection alerts.  Our **query()** function defines the Cosmos DB method to query all items in the container and fetch all results.  The results are written to a variable named `queryResults` and returned to the calling function in **QueryProducts.ts**.
 
 #### API operations
 
