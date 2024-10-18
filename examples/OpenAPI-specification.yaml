@@ -1,0 +1,488 @@
+openapi: 3.0.1
+info:
+  title: Tailwind Products Manager
+  description: Import from "func-products-manager-api" Function App
+  version: '1.0'
+servers:
+  - url: '<your APIM URL goes here>'
+paths:
+  '/products/{id}':
+    delete:
+      summary: DeleteProduct
+      description: DeleteProduct
+      operationId: delete-deleteproduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            maxLength: 36
+            pattern: >-
+              ^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+                message: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example:
+                success: false
+                message: string
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+              example:
+                success: false
+                message: string
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-found'
+              example:
+                success: false
+                message: string
+        '406':
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-acceptable'
+              example:
+                success: false
+                message: string
+        '429':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Too-many-requests'
+              example:
+                success: false
+                message: string
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: string
+    patch:
+      summary: UpdateProduct
+      description: UpdateProduct
+      operationId: patch-updateproduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            maxLength: 36
+            pattern: >-
+              ^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+                message: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example:
+                success: false
+                message: string
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+              example:
+                success: false
+                message: string
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-found'
+              example:
+                success: false
+                message: string
+        '406':
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-acceptable'
+              example:
+                success: false
+                message: string
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unsupported-media-type'
+              example:
+                success: false
+                message: string
+        '429':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Too-many-requests'
+              example:
+                success: false
+                message: string
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: string
+  /products:
+    post:
+      summary: CreateProduct
+      description: CreateProduct
+      operationId: post-createproduct
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+                message: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example:
+                success: false
+                message: string
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+              example:
+                success: false
+                message: string
+        '406':
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-acceptable'
+              example:
+                success: false
+                message: string
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unsupported-media-type'
+              example:
+                success: false
+                message: string
+        '429':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Too-many-requests'
+              example:
+                success: false
+                message: string
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: string
+    get:
+      summary: GetProducts
+      description: GetProducts
+      operationId: get-getproducts
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+                message: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example:
+                success: false
+                message: string
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+              example:
+                success: false
+                message: string
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-found'
+              example:
+                success: false
+                message: string
+        '406':
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-acceptable'
+              example:
+                success: false
+                message: string
+        '429':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Too-many-requests'
+              example:
+                success: false
+                message: string
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: string
+  /products/query:
+    post:
+      summary: QueryProduct
+      description: QueryProduct
+      operationId: post-queryproduct
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+                message: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example:
+                success: false
+                message: string
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forbidden'
+              example:
+                success: false
+                message: string
+        '406':
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Not-acceptable'
+              example:
+                success: false
+                message: string
+        '415':
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unsupported-media-type'
+              example:
+                success: false
+                message: string
+        '429':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Too-many-requests'
+              example:
+                success: false
+                message: string
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: string
+components:
+  schemas:
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 200 response
+    Unauthorized:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 401 response
+    Forbidden:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 403 response
+    Not-acceptable:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 406 response
+    Not-found:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 404 response
+    Unsupported-media-type:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 415 response
+    Too-many-requests:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: 429 response
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          maxLength: 255
+          minLength: 1
+          pattern: '^[\w\s\.\-@:,;]{1,255}$'
+          type: string
+      additionalProperties: false
+      description: Default response
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+    apiKeyQuery:
+      type: apiKey
+      name: subscription-key
+      in: query
+security:
+  - apiKeyHeader: []
+  - apiKeyQuery: []
