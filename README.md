@@ -472,7 +472,7 @@ If we only fix these two problems, our API will pass OpenAPI syntactical validat
 ![image](https://github.com/user-attachments/assets/db5f79f4-1395-4358-9d63-9ac4e7492fd1)
 ![image](https://github.com/user-attachments/assets/9e3abdaf-5499-4b21-9eb5-2fde9cd23a69)
 
-For the purposes of testing code to cloud DevSecOps, it's not strictly necessary to fix any or all of these issues - in fact, it may be desirable to leave some issues open to demonstrate static security testing.  However, if you would like to start from a relatively clean slate and add your own vulnerabilities for demonstration purposes, you can replace the Frontend OpenAPI specification YAML with the contents of the template located at **/examples/OpenAPI-specification-fixed.yml** in the source code repository.
+For the purposes of testing code to cloud DevSecOps, it's not strictly necessary to fix any or all of these issues - in fact, it may be desirable to leave some issues open to demonstrate static security testing.  However, if you would like to start from a relatively clean slate and add your own vulnerabilities for demonstration purposes, you can replace the Frontend OpenAPI specification YAML with the contents of the template located at **/examples/OpenAPI-specification.yml** in the source code repository.  Be sure to update line 7 with your APIM URL!
 
 #### SAST with 42Crunch
 We can add a second pipeline to our project to scan our API specification using 42Crunch's API Security Audit action.  I've provided an Azure Pipelines YAML file in the source code repository at **/examples/api-security-audit-pipeline.yml** that we can use as a template.
@@ -498,11 +498,12 @@ Let's review the pipeline YAML.
 * **Trigger:** None - we don't want this pipeline to automatically run every time an update is committed to the Main branch.  Instead, we will manually execute the pipeline.
 * **Tasks:**
   * `UsePythonVersion@0`: Install Python 3.11 if it is not already present on the agent.
-  * `APISecurityAuditFreemium@1`: Locate and scan REST API contracts.  This action is provided by 42Crunch and documented here.  If you have an account with 42Crunch, you can replace this with the full API Security Audit service.
-  * `PublishBuildArtifacts@1`: These two tasks publish the SARIF and PDF scan results.
+  * `APISecurityAuditFreemium@1`: Locate and scan REST API contracts.  This action is provided by 42Crunch and documented [here](https://github.com/42Crunch/api-security-audit-action-freemium).  If you have an account with 42Crunch, you can replace this with the full [API Security Audit service](https://github.com/42Crunch/api-security-audit-action) which will remove scan quota limits and unlock additional features.
+  * `Bash@3`: This task uses `sed` to post-process the SARIF scan results so that they will be accepted by Github Advanced Security.  The first `sed` command changes all location URIs from absolute paths to relative paths.  The second `sed` command fixes a bug with rule IDs referencing unexpected values by resetting all rule IDs to zero.
+  * `PublishBuildArtifacts@1`: These two tasks publish the SARIF and (optionally) PDF scan results.
   * `AdvancedSecurity-Publish@1`: This task publishes the SARIF file produced by the API Security Audit action to the Advanced Security service so that we can view it in security dashboards and reports.
 
-In a real production environment, we would automate extracting the API specification from the Azure portal and publishing it to our Azure DevOps repository for fully integrated CI/CD experience.  The specification for one or multiple APIs can be extracted with a simple Azure CLI command.  This step might be added to this project in a future update.
+In a real production environment, we would automate extracting the API specification from the Azure portal and publishing it to our Azure DevOps repository for fully integrated CI/CD experience.  The specification for one or multiple APIs can be extracted with a simple Azure CLI command which is included in the template pipeline for your reference.  This step might be added to this project in a future update.
 
 ### Now we can do fun stuff
 
