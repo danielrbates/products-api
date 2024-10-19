@@ -12,33 +12,27 @@ steps:
       architecture:  x64
 
 # Use Azure CLI to retrieve OAS from APIM
-# This task is commented out pending updates from 42Crunch to the Security Audit task
-#  - task: AzureCLI@2
-#    inputs:
-#      azureSubscription: 'ME-MngEnvMCAP009526-danielbates-1 (a46bba68-74e1-46fd-bafd-d9df6f5ddf93)-2136'
-#      scriptType: 'bash'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: 'az apim api export -g <resource-group-name> --service-name <apim-service-name> --api-id <api-name> --export-format OpenApiYamlFile --file-path $(Build.Repository.LocalPath)'
-
-  - task: APISecurityAuditFreemium@1
-    displayName: Audit API Specifications
+# Replace script parameters with your resource group, APIM service name, and API ID
+  - task: AzureCLI@2
     inputs:
-      enforceSQG: false
-      logLevel: INFO
+      azureSubscription: '<your subscription name'  # Azure Resource Manager service connection selected during task configuration
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az apim api export \
+        -g <your-resource-group> \
+        --service-name <your-apim-service-name> \
+        --api-id <your-api-name> \
+        --export-format OpenApiYamlFile \
+        --file-path $(Build.Repository.LocalPath)
+
+  - task: APIContractSecurityAudit@5
+    displayName: Audit API specifications
+    inputs:
+      platformServiceConnection: '42Crunch Audit'
+      logLevel: 'INFO'
+      rootDirectory: '$(Build.Repository.LocalPath)'
       sarifReport: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.sarif'
-      #exportAsPDF: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.pdf'  # Uncomment this line to generate a PDF report
-
-  - task: Bash@3
-    displayName: post-process SARIF for validation
-    inputs:
-      targetType: 'inline'
-      # This script uses two `sed` commands to reformat the SARIF so that it will be accepted by Advanced Security.
-      # The first line changes all location URIs from an absolute path to a relative path.
-      # The second line forces all Rule IDs to zero to fix a bug with Rule IDs referencing unexpected values.
-      script: |
-        sed -i --expression="s|$(Build.Repository.LocalPath)\/||" $(Build.BuildId)-auditreport.sarif
-        sed -i --expression='s|ruleIndex\": [0-9]*|ruleIndex\": 0|' $(Build.BuildId)-auditreport.sarif
-      workingDirectory: '$(Build.Repository.LocalPath)'
 
   - task: PublishBuildArtifacts@1
     displayName: publishAuditSarif
@@ -46,13 +40,6 @@ steps:
       PathtoPublish: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.sarif'
       ArtifactName: 'CodeAnalysisLogs'
       publishLocation: 'Container'
-
-#  - task: PublishBuildArtifacts@1  # Uncomment this task to publish the PDF report, if it is generated.
-#    displayName: publishAuditPDF
-#    inputs:
-#      PathtoPublish: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.pdf'
-#      ArtifactName: 'Reports'
-#      publishLocation: 'Container'
 
   - task: AdvancedSecurity-Publish@1
     displayName: Publish to Advanced Security
