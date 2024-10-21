@@ -5,11 +5,14 @@ export async function UpdateProduct(request: HttpRequest, context: InvocationCon
     context.log(`Http function processed request for url "${request.url}"`);
 
     try {
-        // Parse request body to extract product data
+        // Extract product id from the request
+        const id: string = request.params.id;
+
+        // Parse request body to extract partition key and operation data
         const product = await request.json();
 
         // Update the product using the productService
-        const updatedProduct = await productService.update(product);
+        const updatedProduct = await productService.update(id, product);
 
         return {
             status: 200,
