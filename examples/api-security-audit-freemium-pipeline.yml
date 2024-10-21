@@ -1,0 +1,52 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: UsePythonVersion@0
+    displayName: Install Python
+    inputs:
+      versionSpec: '3.11'
+      addToPath: true
+      architecture:  x64
+
+  - task: APISecurityAuditFreemium@1
+    displayName: Audit API Specifications
+    inputs:
+      enforceSQG: false
+      logLevel: INFO
+      sarifReport: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.sarif'
+      #exportAsPDF: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.pdf'  # Uncomment this line to generate a PDF report
+
+  - task: Bash@3
+    displayName: post-process SARIF for validation
+    inputs:
+      targetType: 'inline'
+      # This script uses two `sed` commands to reformat the SARIF so that it will be accepted by Advanced Security.
+      # The first line changes all location URIs from an absolute path to a relative path.
+      # The second line forces all Rule IDs to zero to fix a bug with Rule IDs referencing unexpected values.
+      script: |
+        sed -i --expression="s|$(Build.Repository.LocalPath)\/||" $(Build.BuildId)-auditreport.sarif
+        sed -i --expression='s|ruleIndex\": [0-9]*|ruleIndex\": 0|' $(Build.BuildId)-auditreport.sarif
+      workingDirectory: '$(Build.Repository.LocalPath)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: publishAuditSarif
+    inputs:
+      PathtoPublish: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.sarif'
+      ArtifactName: 'CodeAnalysisLogs'
+      publishLocation: 'Container'
+
+#  - task: PublishBuildArtifacts@1  # Uncomment this task to publish the PDF report, if it is generated.
+#    displayName: publishAuditPDF
+#    inputs:
+#      PathtoPublish: '$(Build.Repository.LocalPath)/$(Build.BuildId)-auditreport.pdf'
+#      ArtifactName: 'Reports'
+#      publishLocation: 'Container'
+
+  - task: AdvancedSecurity-Publish@1
+    displayName: Publish to Advanced Security
+    inputs:
+      SarifsInputDirectory: '$(Build.Repository.LocalPath)'
+      Category: '42Crunch API Security Audit'
