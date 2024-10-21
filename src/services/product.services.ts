@@ -49,8 +49,8 @@ const productService = {
   },
   
   async delete(id: string) {
-    const result = await this.container.item(id).delete();
-    return;
+    const { resource } = await this.container.item(id).delete();
+    return resource;
   },
 };
 
