@@ -475,11 +475,14 @@ If we only fix these two problems, our API will pass OpenAPI syntactical validat
 For the purposes of testing code to cloud DevSecOps, it's not strictly necessary to fix any or all of these issues - in fact, it may be desirable to leave some issues open to demonstrate static security testing.  However, if you would like to start from a relatively clean slate and add your own vulnerabilities for demonstration purposes, you can replace the Frontend OpenAPI specification YAML with the contents of the template located at **/examples/OpenAPI-specification.yml** in the source code repository.  Be sure to update line 7 with your APIM URL!
 
 #### SAST with 42Crunch
-We can add a second pipeline to our project to scan our API specification using 42Crunch's API Security Audit action.  I've provided an Azure Pipelines YAML file in the source code repository at **/examples/api-security-audit-pipeline.yml** that we can use as a template.
 
-The first step is to install the [42Crunch Azure DevOps extension](https://marketplace.visualstudio.com/items?itemName=42Crunch.42c-cicd-audit-freemium) in our organization.
+Since we are testing DevSecOps practices, we need to try to automate security scanning of the OpenAPI specification, or OAS, without manually exporting and pushing files - this should all be done automatically.  We will create a second pipeline to automatically export the current OAS, scan it using 42Crunch's security audit service, and publish the results to GitHub Advanced Security.
 
-Next, we can create our security audit pipeline.  As we did with the build pipeline, click **New pipeline**, select **Azure Repos Git** for your code location, and select your repository name:
+> Note: This step requires an account on the [42Crunch Platform](https://platform.42crunch.com/login), either as a solo developer with a monthly subscription or as an invited user in an entitled organization.  If you do not have an account, skip to the next section to create a limited SAST pipeline with the 42Crunch Freemium task.
+
+The first step is to install the [42Crunch Azure DevOps extension](https://marketplace.visualstudio.com/items?itemName=42Crunch.cicd) in our organization.
+
+Next, we can create a security audit pipeline.  I've provided an Azure Pipelines YAML file in the source code repository at **/examples/api-security-audit-pipeline.yml** that we can use as a template.  As we did with the build pipeline, click **New pipeline**, select **Azure Repos Git** for your code location, and select your repository name:
 
 ![image](https://github.com/user-attachments/assets/e3714f28-2413-492d-9c6d-77bab169c311)
 
@@ -491,19 +494,42 @@ From **Configure your pipeline**, choose **Existing Azure Pipelines YAML file**:
 
 In the sidebar, choose the security audit pipeline template from the **/examples/** directory and select **Continue**:
 
-![image](https://github.com/user-attachments/assets/9a064177-ca4a-4739-b723-c9a1e9503a46)
+![image](https://github.com/user-attachments/assets/32697eac-2e68-4eb9-8ecd-ef0da29cceb9)
 
 Let's review the pipeline YAML.
 
-* **Trigger:** None - we don't want this pipeline to automatically run every time an update is committed to the Main branch.  Instead, we will manually execute the pipeline.
+* **Trigger:** none.  We will run this pipeline on demand, but this can be integrated into a build pipeline with security gates enforced to block builds if the audit fails.
 * **Tasks:**
-  * `UsePythonVersion@0`: Install Python 3.11 if it is not already present on the agent.
-  * `APISecurityAuditFreemium@1`: Locate and scan REST API contracts.  This action is provided by 42Crunch and documented [here](https://github.com/42Crunch/api-security-audit-action-freemium).  If you have an account with 42Crunch, you can replace this with the full [API Security Audit service](https://github.com/42Crunch/api-security-audit-action) which will remove scan quota limits and unlock additional features.
-  * `Bash@3`: This task uses `sed` to post-process the SARIF scan results so that they will be accepted by Github Advanced Security.  The first `sed` command changes all location URIs from absolute paths to relative paths.  The second `sed` command fixes a bug with rule IDs referencing unexpected values by resetting all rule IDs to zero.
-  * `PublishBuildArtifacts@1`: These two tasks publish the SARIF and (optionally) PDF scan results.
-  * `AdvancedSecurity-Publish@1`: This task publishes the SARIF file produced by the API Security Audit action to the Advanced Security service so that we can view it in security dashboards and reports.
+  * `UsePythonVersion@0` - Install Python 3.11 if it is not already present on the agent.
+  * `AzureCLI@2` - Run a short Azure CLI command to export the API specification as a YAML file in the build agent's local path.  This will place the current API spec in our pipeline working directory for the security audit task to discover and scan.  Required parameters include the resource group name, APIM service name, and API name.  You will need a service connection to Azure Resource Manager.
+  * `APIContractSecurityAudit@5` - This task locates and scans the YAML file exported by the previous command.  The service will discover any OpenAPI-compatible YAML or JSON file in the repository or the working directory of the build agent.  In our case, we should not have any OpenAPI specifications in the repo so the service will only discover the file created by our Azure CLI command.
+  * `PublishBuildArtifacts@1` - This task publishes the scan results to pipeline artifacts as a SARIF file.
+  * `AdvancedSecurity-Publish@1`- This task formats and uploads the SARIF file produced by the API Security Audit action to the Advanced Security service so that we can view it in security dashboards and reports.
+ 
+After you run the pipeline, wait a few moments for results to be published to Defender for Cloud.  They will appear as Findings in the recommendation titled **Azure DevOps repositories should have code scanning findings resolved**.
 
-In a real production environment, we would automate extracting the API specification from the Azure portal and publishing it to our Azure DevOps repository for fully integrated CI/CD experience.  The specification for one or multiple APIs can be extracted with a simple Azure CLI command which is included in the template pipeline for your reference.  This step might be added to this project in a future update.
+![image](https://github.com/user-attachments/assets/d24520fe-fede-4667-9857-003cdde823e1)
+
+
+#### [Optional] SAST with 42Crunch (Freemium version)
+
+There is a completely free version of the 42Crunch security audit solution, but it comes with a few tradeoffs compared to the full version.  There is a monthly limit to the number of scans you can run, and the results are generated in a slightly different format that requires an additional step to upload into GitHub Advanced Security.  However, there is no platform login or monthly subscription required.
+
+First, install the [Freemium extension](https://marketplace.visualstudio.com/items?itemName=42Crunch.42c-cicd-audit-freemium) to your Azure DevOps organization.
+
+When creating the pipeline from a file, use the `api-security-audit-freemium-pipeline.yml` template.  Some of the tasks are slightly different:
+
+* **Trigger:** None - no change here
+* **Tasks:**
+  * `UsePythonVersion@0` - no change here
+  * `APISecurityAuditFreemium@1` - the Freemium task doesn't allow us to specify the root directory for discovery.  It will only discover JSON and YAML files that are in the repo.
+  * `Bash@3` - This task uses `sed` to post-process the SARIF scan results so that they will be accepted by Github Advanced Security.  The first `sed` command changes all location URIs from absolute paths to relative paths.  The second `sed` command fixes a bug with rule IDs referencing unexpected values by resetting all rule IDs to zero.
+  * `PublishBuildArtifacts@1` - no change here
+  * `AdvancedSecurity-Publish@1` - no change here
+
+Because the Freemium version will not discover files in the local path of the build agent - only files that were cloned from the repository during the pipeline run - we have to manually export the OAS file from Azure and upload it to the repository.  The Freemium scanner will decrement your monthly scan quota for each OAS file it discovers on every run; be sure to only keep one YAML or JSON specification in your repository at a time!
+
+
 
 ### Now we can do fun stuff
 
