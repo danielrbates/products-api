@@ -1,22 +1,22 @@
 import { app } from "@azure/functions";
-import { GetAllProducts } from "./functions/GetProducts";
-import { QueryProduct } from "./functions/QueryProducts";
+import { GetProducts } from "./functions/GetProducts";
+import { QueryProducts } from "./functions/QueryProducts";
 import { CreateProduct } from "./functions/CreateProduct";
 import { DeleteProduct } from "./functions/DeleteProduct";
 import { UpdateProduct } from "./functions/UpdateProduct";
 
-app.http('GetAllProducts', {
+app.http('GetProducts', {
     methods: ['GET'],
-    route: 'allproducts',
+    route: 'products',
     authLevel: 'anonymous',
-    handler: GetAllProducts
+    handler: GetProducts
 });
 
 app.http('QueryProduct', {
   methods: ['POST'],
   route: 'products/query',
   authLevel: 'anonymous',
-  handler: QueryProduct
+  handler: QueryProducts
 });
 
 app.http('CreateProduct', {
@@ -34,7 +34,7 @@ app.http('DeleteProduct', {
 });
 
 app.http('UpdateProduct', {
-  methods: ['PUT'],
+  methods: ['PATCH'],
   route: 'products/{id}',
   authLevel: 'anonymous',
   handler: UpdateProduct
