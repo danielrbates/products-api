@@ -5,7 +5,7 @@ export async function DeleteProduct(request: HttpRequest, context: InvocationCon
     context.log(`Http function processed request for url "${request.url}"`);
 
     try {
-        // Extract product id and brand name from the request
+        // Extract product id from the request
         const id: string = request.params.id;
 
         // Delete the product using the productService
