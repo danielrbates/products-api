@@ -38,14 +38,16 @@ const productService = {
     }
   },
 
-  async update(product) {
+  async update(id: string, product) {
+    const operations: string[] = product.operations;
     const { resource } = await this.container.item(
-      product.id,
-      product.brand.name,
+      id,
+      product.categoryId,
     )
-      .replace(product);
+      .patch(operations);
     return resource;
   },
+  
   async delete(id: string) {
     const result = await this.container.item(id).delete();
     return;
