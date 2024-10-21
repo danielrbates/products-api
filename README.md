@@ -472,7 +472,7 @@ If we only fix these two problems, our API will pass OpenAPI syntactical validat
 ![image](https://github.com/user-attachments/assets/db5f79f4-1395-4358-9d63-9ac4e7492fd1)
 ![image](https://github.com/user-attachments/assets/9e3abdaf-5499-4b21-9eb5-2fde9cd23a69)
 
-For the purposes of testing code to cloud DevSecOps, it's not strictly necessary to fix any or all of these issues - in fact, it may be desirable to leave some issues open to demonstrate static security testing.  However, if you would like to start from a relatively clean slate and add your own vulnerabilities for demonstration purposes, you can replace the Frontend OpenAPI specification YAML with the contents of the template located at **/examples/OpenAPI-specification.yml** in the source code repository.  Be sure to update line 7 with your APIM URL!
+For the purposes of testing code to cloud DevSecOps, it's not strictly necessary to fix any or all of these issues - in fact, it may be desirable to leave some issues open to demonstrate static security testing.  However, if you would like to start from a relatively clean slate and add your own vulnerabilities for demonstration purposes, you can replace the Frontend OpenAPI specification YAML with the contents of the template located at **/examples/OpenAPI-specification.yaml.template** in the source code repository.  Be sure to update line 7 with your APIM URL!
 
 #### SAST with 42Crunch
 
