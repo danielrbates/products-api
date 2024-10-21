@@ -29,16 +29,9 @@ const productService = {
     return resources;
   },
 
-  async query(itemId: string) {
+  async query(userQuery: string) {
     try {
-      const querySpec = {
-        query: `SELECT * FROM ${containerId} as c WHERE c.id = @id`,
-        parameters: [{
-          name: "@id",
-          value: itemId
-        }]
-      };
-      const queryResults = await this.container.items.query(querySpec).fetchAll();
+      const queryResults = await this.container.items.query(userQuery).fetchAll();
       return queryResults;
     } catch (error) {
       console.error(`An error occurred in the query: ${error.message}`);
