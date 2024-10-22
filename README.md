@@ -541,7 +541,7 @@ Decode this string from Base64 using Cyberchef or another tool of your choice:
 
 > Note: This is a real Cosmos DB key that has long since been rotated.  Store only in encoded form if you have any kind of sensitive information inspection enabled!
 
-Add the decoded secret to a file and commit your changes.  GitHub Advanced Security will block the push.  To override the block, put this string in your commmit message:
+Add the decoded secret to a file and commit your changes.  GitHub Advanced Security will block the push.  To override the block, put this string in your commit message:
 
 `skip-secret-scanning:true`
 
