@@ -175,7 +175,7 @@ Finally, go to **Settings** > **Keys** and make a note of the primary connection
 
 #### Create Function App
 
-We will create an empty Function App that we'll later use as the target for our automated CI/CD pipeline.  This project only needs the basic Consumption tier, but you can choose Flex or Premium if you want to use more advanced identity and private network configurations.
+We will create an empty Function App that we'll later use as the target for our automated CI/CD pipeline.  This project only needs the basic Consumption tier, but you can choose Flex or Premium if you want to use more advanced identity and private network configurations or App Service if you'd like to test Defender for App Service workload protections.
 
 ![image](https://github.com/user-attachments/assets/7a90ff54-ff3d-4906-91c3-f41935641aee)
 
@@ -190,9 +190,21 @@ Use the following settings:
 
 ![image](https://github.com/user-attachments/assets/b865c6f8-de21-4f74-8db6-6b0d4777a419)
 
-Azure will create a storage account for the Function App.  Make a note of the name - we may need to reference it later.
+Azure will create a storage account for the Function App.  Make a note of the name - we will need to reference it later.
 
-Once the resource has been deployed, go to **Settings** > **Environment variables** and open the **Connection strings** tab.  Click **+ Add** to create a new connection string.  Use the following values:
+Once the resource has been deployed, go to **Settings** > **Identity** and enable "System Assigned" by turning the status switch to **On**.  Save this change:
+
+![image](https://github.com/user-attachments/assets/c022adce-867f-40b1-b20e-3683637eb186)
+
+Then, click on **Azure role assignments** and add a role assignment, **Storage Blob Data Owner**, to the storage account we noted previously.
+
+![image](https://github.com/user-attachments/assets/5d39a43a-e542-4471-ad1d-0f58e5a007ae)
+
+Next, go to **Settings** > **Environment variables** and look for the variable with a name like "AzureWebJobsStorage".  Change the name to `AzureWebJobsStorage__accountName` and the value to the name of the function app's storage account.  Copy the new variable name exactly - there are two underscores before "accountName".
+
+![image](https://github.com/user-attachments/assets/c1dec46c-d600-4101-b64e-e90e8e1fee2a)
+
+Now let's add the connection string for our Cosmos DB account.  While we are still in the **Environment Variable** settings page, open the **Connection strings** tab.  Click **+ Add** to create a new connection string.  Use the following values:
 
 * **Name:** CosmosDbConnectionString
 * **Value:** paste the primary connection string from your Cosmos DB account.  It will be formatted like "AccountEndpoint=https://<name>.documents.azure.com:443/;AccountKey=<string>;"
@@ -200,7 +212,7 @@ Once the resource has been deployed, go to **Settings** > **Environment variable
 	
 > Note: You can choose any type for your connection string - it doesn't have to be **Document Db** - but if you change the type here, you'll also need to change the environment variable prefix in **/services/product.services.ts**.
 
-![image](https://github.com/user-attachments/assets/7db74f99-d3e7-4c03-b19d-4b1fcabf93eb)
+![image](https://github.com/user-attachments/assets/7a0a3286-6fe9-49a4-acbf-df1034bd513a)
 
 Click **Apply** twice and select **Confirm** when the UI warns that the app may restart.
 
